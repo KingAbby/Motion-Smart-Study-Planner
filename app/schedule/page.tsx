@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
 
 const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const timeSlots = [
@@ -37,10 +39,14 @@ const sampleEvents: ScheduleEvent[] = [
   { id: 14, day: "Sat", startTime: "14:00", duration: 1.5, subject: "Physics", type: "Study", color: "#ef4444" },
 ];
 
-const views = ["Week", "Day"];
-
 export default function SchedulePage() {
-  const [activeView, setActiveView] = useState("Week");
+  const { language } = useLanguage();
+  const t = translations[language].schedule;
+  const views = [
+    { value: "week", label: t.views.week },
+    { value: "day", label: t.views.day },
+  ];
+  const [activeView, setActiveView] = useState("week");
   const [selectedDay, setSelectedDay] = useState("Mon");
 
   const getEventsForDay = (day: string) =>
@@ -54,8 +60,8 @@ export default function SchedulePage() {
   return (
     <div>
       <div className="page-header animate-fade-in">
-        <h1>Study Schedule</h1>
-        <p>Plan your weekly study sessions and manage your calendar</p>
+        <h1>{t.title}</h1>
+        <p>{t.subtitle}</p>
       </div>
 
       {/* Controls */}
@@ -71,7 +77,7 @@ export default function SchedulePage() {
         className="animate-fade-in"
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <h2 style={{ fontSize: "18px", fontWeight: 600 }}>March 16 – 22, 2026</h2>
+          <h2 style={{ fontSize: "18px", fontWeight: 600 }}>{t.dateRange}</h2>
           <div style={{ display: "flex", gap: "4px" }}>
             <button className="btn-icon" style={{ width: "32px", height: "32px" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
@@ -85,23 +91,23 @@ export default function SchedulePage() {
           <div className="tabs" style={{ marginBottom: 0 }}>
             {views.map((v) => (
               <button
-                key={v}
-                className={`tab ${activeView === v ? "active" : ""}`}
-                onClick={() => setActiveView(v)}
+                key={v.value}
+                className={`tab ${activeView === v.value ? "active" : ""}`}
+                onClick={() => setActiveView(v.value)}
               >
-                {v}
+                {v.label}
               </button>
             ))}
           </div>
           <Link href="/schedule/planner" className="btn-primary" style={{ fontSize: "13px", padding: "8px 16px" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
-            Auto Plan
+            {t.autoPlan}
           </Link>
         </div>
       </div>
 
       {/* Day Selector for mobile / day view */}
-      {activeView === "Day" && (
+      {activeView === "day" && (
         <div className="tabs animate-fade-in" style={{ overflowX: "auto" }}>
           {daysOfWeek.map((day) => (
             <button
@@ -109,14 +115,14 @@ export default function SchedulePage() {
               className={`tab ${selectedDay === day ? "active" : ""}`}
               onClick={() => setSelectedDay(day)}
             >
-              {day}
+              {t.daysShort[day as keyof typeof t.daysShort] || day}
             </button>
           ))}
         </div>
       )}
 
       {/* Week View */}
-      {activeView === "Week" && (
+      {activeView === "week" && (
         <div className="glass-card-static animate-fade-in" style={{ padding: "0", overflow: "hidden" }}>
           <div
             style={{
@@ -148,7 +154,7 @@ export default function SchedulePage() {
                     borderRight: "1px solid var(--border-color)",
                   }}
                 >
-                  {day}
+                  {t.daysShort[day as keyof typeof t.daysShort] || day}
                 </div>
               ))}
             </div>
@@ -236,15 +242,18 @@ export default function SchedulePage() {
       )}
 
       {/* Day View */}
-      {activeView === "Day" && (
+      {activeView === "day" && (
         <div className="glass-card-static animate-fade-in" style={{ padding: "24px" }}>
           <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "20px" }}>
-            {selectedDay} Schedule
+            {t.daySchedule.replace(
+              "{day}",
+              t.daysShort[selectedDay as keyof typeof t.daysShort] || selectedDay,
+            )}
           </h3>
           {getEventsForDay(selectedDay).length === 0 ? (
             <div className="empty-state">
-              <h3>No sessions planned</h3>
-              <p>This day is free! Consider planning a study session.</p>
+              <h3>{t.noSessionsTitle}</h3>
+              <p>{t.noSessionsDesc}</p>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>

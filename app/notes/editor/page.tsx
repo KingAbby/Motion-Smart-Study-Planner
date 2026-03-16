@@ -2,13 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-
-const toolbarButtons = [
-  { icon: "B", label: "Bold", style: "bold" },
-  { icon: "I", label: "Italic", style: "italic" },
-  { icon: "U", label: "Underline", style: "underline" },
-  { icon: "S", label: "Strikethrough", style: "strikethrough" },
-];
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
 
 const headingButtons = ["H1", "H2", "H3"];
 
@@ -54,6 +49,14 @@ Hash maps provide O(1) average case lookup, insert, and delete operations.
 `;
 
 export default function NoteEditorPage() {
+  const { language } = useLanguage();
+  const t = translations[language].noteEditor;
+  const toolbarButtons = [
+    { icon: "B", label: t.toolbar.bold, style: "bold" },
+    { icon: "I", label: t.toolbar.italic, style: "italic" },
+    { icon: "U", label: t.toolbar.underline, style: "underline" },
+    { icon: "S", label: t.toolbar.strikethrough, style: "strikethrough" },
+  ];
   const [content, setContent] = useState(defaultContent);
   const [title, setTitle] = useState("Data Structures & Algorithms");
   const [course, setCourse] = useState("Computer Science");
@@ -90,20 +93,20 @@ export default function NoteEditorPage() {
                 <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
               </svg>
             </Link>
-            <h1>Note Editor</h1>
+            <h1>{t.title}</h1>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {saved && (
               <span className="animate-fade-in" style={{ fontSize: "12px", color: "var(--success)", display: "flex", alignItems: "center", gap: "4px" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
-                Saved
+                {t.saved}
               </span>
             )}
             <button className="btn-secondary" style={{ padding: "8px 16px" }} onClick={handleSave}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" />
               </svg>
-              Save
+              {t.save}
             </button>
           </div>
         </div>
@@ -113,7 +116,9 @@ export default function NoteEditorPage() {
       <div className="glass-card-static animate-fade-in" style={{ padding: "20px", marginBottom: "16px" }}>
         <div className="grid-2">
           <div>
-            <label style={{ display: "block", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)", marginBottom: "6px" }}>Title</label>
+            <label style={{ display: "block", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)", marginBottom: "6px" }}>
+              {t.titleLabel}
+            </label>
             <input
               type="text"
               className="input-field"
@@ -123,7 +128,9 @@ export default function NoteEditorPage() {
             />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)", marginBottom: "6px" }}>Course</label>
+            <label style={{ display: "block", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)", marginBottom: "6px" }}>
+              {t.courseLabel}
+            </label>
             <select className="input-field" value={course} onChange={(e) => setCourse(e.target.value)}>
               <option>Computer Science</option>
               <option>Mathematics</option>
@@ -175,22 +182,22 @@ export default function NoteEditorPage() {
           </button>
         ))}
         <div style={{ width: "1px", height: "24px", background: "var(--border-color)", margin: "0 4px" }} />
-        <button className="btn-ghost" title="Bulleted List" style={{ padding: "6px 10px" }}>
+        <button className="btn-ghost" title={t.toolbar.bulletedList} style={{ padding: "6px 10px" }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
         </button>
-        <button className="btn-ghost" title="Code Block" style={{ padding: "6px 10px" }}>
+        <button className="btn-ghost" title={t.toolbar.codeBlock} style={{ padding: "6px 10px" }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
         </button>
-        <button className="btn-ghost" title="Quote" style={{ padding: "6px 10px" }}>
+        <button className="btn-ghost" title={t.toolbar.quote} style={{ padding: "6px 10px" }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
         </button>
         <div style={{ flex: 1 }} />
         <div className="tabs" style={{ marginBottom: 0, background: "transparent" }}>
           <button className={`tab ${!isPreview ? "active" : ""}`} onClick={() => setIsPreview(false)} style={{ fontSize: "12px", padding: "6px 14px" }}>
-            Edit
+            {t.editTab}
           </button>
           <button className={`tab ${isPreview ? "active" : ""}`} onClick={() => setIsPreview(true)} style={{ fontSize: "12px", padding: "6px 14px" }}>
-            Preview
+            {t.previewTab}
           </button>
         </div>
       </div>

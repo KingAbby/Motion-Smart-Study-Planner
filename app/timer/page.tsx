@@ -1,23 +1,26 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-
-const PRESETS = [
-  { label: "Classic", work: 25, short: 5, long: 15 },
-  { label: "Long Focus", work: 50, short: 10, long: 20 },
-  { label: "Quick Sprint", work: 15, short: 3, long: 10 },
-];
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
 
 const sessionHistory = [
-  { time: "09:15 AM", duration: "25 min", subject: "Mathematics", type: "Focus" },
-  { time: "09:45 AM", duration: "5 min", subject: "—", type: "Break" },
-  { time: "09:50 AM", duration: "25 min", subject: "Mathematics", type: "Focus" },
-  { time: "10:20 AM", duration: "5 min", subject: "—", type: "Break" },
-  { time: "10:25 AM", duration: "25 min", subject: "Computer Science", type: "Focus" },
-  { time: "10:55 AM", duration: "15 min", subject: "—", type: "Long Break" },
+  { time: "09:15 AM", duration: "25 min", subject: "Mathematics", type: "focus" },
+  { time: "09:45 AM", duration: "5 min", subject: "—", type: "break" },
+  { time: "09:50 AM", duration: "25 min", subject: "Mathematics", type: "focus" },
+  { time: "10:20 AM", duration: "5 min", subject: "—", type: "break" },
+  { time: "10:25 AM", duration: "25 min", subject: "Computer Science", type: "focus" },
+  { time: "10:55 AM", duration: "15 min", subject: "—", type: "longBreak" },
 ];
 
 export default function TimerPage() {
+  const { language } = useLanguage();
+  const t = translations[language].timer;
+  const presets = [
+    { label: t.presetClassic, work: 25, short: 5, long: 15 },
+    { label: t.presetLongFocus, work: 50, short: 10, long: 20 },
+    { label: t.presetQuickSprint, work: 15, short: 3, long: 10 },
+  ];
   const [workMinutes, setWorkMinutes] = useState(25);
   const [breakMinutes, setBreakMinutes] = useState(5);
   const [secondsLeft, setSecondsLeft] = useState(25 * 60);
@@ -66,8 +69,8 @@ export default function TimerPage() {
   return (
     <div>
       <div className="page-header animate-fade-in">
-        <h1>Focus Timer</h1>
-        <p>Stay productive with the Pomodoro technique — focus, break, repeat</p>
+        <h1>{t.title}</h1>
+        <p>{t.subtitle}</p>
       </div>
 
       <div className="grid-2" style={{ alignItems: "start" }}>
@@ -86,7 +89,7 @@ export default function TimerPage() {
               marginBottom: "32px",
             }}
           >
-            {isBreak ? "☕ Break Time" : "🎯 Focus Mode"}
+            {isBreak ? t.breakTime : t.focusMode}
           </div>
 
           {/* Timer Ring */}
@@ -129,7 +132,7 @@ export default function TimerPage() {
                 {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
               </div>
               <div style={{ fontSize: "14px", color: "var(--text-muted)", marginTop: "4px" }}>
-                Session #{sessions + 1}
+                {t.sessionLabel}{sessions + 1}
               </div>
             </div>
           </div>
@@ -140,7 +143,7 @@ export default function TimerPage() {
               className="btn-icon"
               onClick={() => resetTimer(workMinutes)}
               style={{ width: "48px", height: "48px" }}
-              title="Reset"
+              title={t.reset}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
@@ -188,7 +191,7 @@ export default function TimerPage() {
                 }
               }}
               style={{ width: "48px", height: "48px" }}
-              title="Skip"
+              title={t.skip}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="5 4 15 12 5 20 5 4" /><line x1="19" y1="5" x2="19" y2="19" />
@@ -199,7 +202,7 @@ export default function TimerPage() {
           {/* Subject */}
           <div style={{ marginTop: "28px" }}>
             <label style={{ fontSize: "12px", color: "var(--text-muted)", display: "block", marginBottom: "6px" }}>
-              Currently studying
+              {t.currentlyStudying}
             </label>
             <select
               className="input-field"
@@ -222,10 +225,10 @@ export default function TimerPage() {
           {/* Presets */}
           <div className="glass-card animate-fade-in stagger-1" style={{ padding: "24px", opacity: 0 }}>
             <h2 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>
-              ⏱️ Timer Presets
+              {t.presetsTitle}
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {PRESETS.map((preset) => (
+              {presets.map((preset) => (
                 <button
                   key={preset.label}
                   className="btn-ghost"
@@ -244,7 +247,7 @@ export default function TimerPage() {
                 >
                   <span style={{ fontWeight: 600 }}>{preset.label}</span>
                   <span style={{ color: "var(--text-muted)", fontSize: "12px" }}>
-                    {preset.work}m / {preset.short}m break
+                    {preset.work}m / {preset.short}m
                   </span>
                 </button>
               ))}
@@ -254,14 +257,14 @@ export default function TimerPage() {
           {/* Session Stats */}
           <div className="glass-card animate-fade-in stagger-2" style={{ padding: "24px", opacity: 0 }}>
             <h2 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>
-              📊 Today&apos;s Stats
+              {t.todayStats}
             </h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               {[
-                { label: "Sessions", value: sessions, color: "#6366f1" },
-                { label: "Focus Time", value: `${sessions * workMinutes}m`, color: "#8b5cf6" },
-                { label: "Break Time", value: `${sessions * breakMinutes}m`, color: "#10b981" },
-                { label: "Streak", value: "3 🔥", color: "#f59e0b" },
+                { label: t.sessions, value: sessions, color: "#6366f1" },
+                { label: t.focusTime, value: `${sessions * workMinutes}m`, color: "#8b5cf6" },
+                { label: t.breakTimeLabel, value: `${sessions * breakMinutes}m`, color: "#10b981" },
+                { label: t.streak, value: "3", color: "#f59e0b" },
               ].map((stat) => (
                 <div
                   key={stat.label}
@@ -282,7 +285,7 @@ export default function TimerPage() {
           {/* Session History */}
           <div className="glass-card animate-fade-in stagger-3" style={{ padding: "24px", opacity: 0 }}>
             <h2 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>
-              📋 Session History
+              {t.sessionHistory}
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {sessionHistory.map((s, i) => (
@@ -305,11 +308,11 @@ export default function TimerPage() {
                       borderRadius: "var(--radius-full)",
                       fontSize: "11px",
                       fontWeight: 600,
-                      background: s.type === "Focus" ? "rgba(99,102,241,0.15)" : s.type === "Long Break" ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)",
-                      color: s.type === "Focus" ? "#818cf8" : s.type === "Long Break" ? "#34d399" : "#fbbf24",
+                      background: s.type === "focus" ? "rgba(99,102,241,0.15)" : s.type === "longBreak" ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)",
+                      color: s.type === "focus" ? "#818cf8" : s.type === "longBreak" ? "#34d399" : "#fbbf24",
                     }}
                   >
-                    {s.type}
+                    {t.types[s.type as keyof typeof t.types]}
                   </span>
                   <span style={{ flex: 1, color: "var(--text-secondary)" }}>{s.subject}</span>
                   <span style={{ color: "var(--text-muted)" }}>{s.duration}</span>

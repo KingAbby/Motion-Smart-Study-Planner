@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
 
 interface Note {
   id: number;
@@ -88,26 +90,37 @@ const sampleNotes: Note[] = [
   },
 ];
 
-const courses = ["All", "Computer Science", "Psychology", "Mathematics", "Chemistry", "English Literature", "Environmental Science", "Physics"];
-
 export default function NotesPage() {
+  const { language } = useLanguage();
+  const t = translations[language].notes;
+  const courses = [
+    { value: "all", label: t.courseAll },
+    { value: "Computer Science", label: "Computer Science" },
+    { value: "Psychology", label: "Psychology" },
+    { value: "Mathematics", label: "Mathematics" },
+    { value: "Chemistry", label: "Chemistry" },
+    { value: "English Literature", label: "English Literature" },
+    { value: "Environmental Science", label: "Environmental Science" },
+    { value: "Physics", label: "Physics" },
+  ];
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCourse, setActiveCourse] = useState("All");
+  const [activeCourse, setActiveCourse] = useState("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const filteredNotes = sampleNotes.filter((note) => {
     const matchesSearch =
       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       note.snippet.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCourse = activeCourse === "All" || note.course === activeCourse;
+    const matchesCourse =
+      activeCourse === "all" || note.course === activeCourse;
     return matchesSearch && matchesCourse;
   });
 
   return (
     <div>
       <div className="page-header animate-fade-in">
-        <h1>Notes</h1>
-        <p>Organize your study notes by course and topic</p>
+        <h1>{t.title}</h1>
+        <p>{t.subtitle}</p>
       </div>
 
       {/* Search & Controls */}
@@ -131,7 +144,7 @@ export default function NotesPage() {
           <input
             type="text"
             className="input-field"
-            placeholder="Search notes..."
+            placeholder={t.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ paddingLeft: "42px" }}
@@ -170,12 +183,12 @@ export default function NotesPage() {
       <div className="tabs animate-fade-in" style={{ overflowX: "auto", flexWrap: "nowrap" }}>
         {courses.map((c) => (
           <button
-            key={c}
-            className={`tab ${activeCourse === c ? "active" : ""}`}
-            onClick={() => setActiveCourse(c)}
+            key={c.value}
+            className={`tab ${activeCourse === c.value ? "active" : ""}`}
+            onClick={() => setActiveCourse(c.value)}
             style={{ whiteSpace: "nowrap" }}
           >
-            {c}
+            {c.label}
           </button>
         ))}
       </div>
@@ -186,8 +199,8 @@ export default function NotesPage() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
           </svg>
-          <h3>No notes found</h3>
-          <p>Try searching with different keywords or create a new note</p>
+          <h3>{t.emptyTitle}</h3>
+          <p>{t.emptyDesc}</p>
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
@@ -270,7 +283,7 @@ export default function NotesPage() {
       )}
 
       {/* FAB */}
-      <Link href="/notes/editor" className="fab" title="New Note">
+      <Link href="/notes/editor" className="fab" title={t.newNote}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
         </svg>

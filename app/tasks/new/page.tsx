@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
 
 export default function NewTaskPage() {
+  const { language } = useLanguage();
+  const t = translations[language].newTask;
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -35,9 +39,9 @@ export default function NewTaskPage() {
               <polyline points="12 19 5 12 12 5" />
             </svg>
           </Link>
-          <h1>Add New Task</h1>
+          <h1>{t.title}</h1>
         </div>
-        <p>Create a new task with details, deadline, and priority</p>
+        <p>{t.subtitle}</p>
       </div>
 
       {saved && (
@@ -61,24 +65,24 @@ export default function NewTaskPage() {
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
-          Task created successfully!
+          {t.created}
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
         <div className="glass-card-static animate-fade-in" style={{ padding: "28px", marginBottom: "20px" }}>
           <h2 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "20px", color: "var(--text-accent)" }}>
-            Task Details
+            {t.detailsTitle}
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
             <div>
               <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "6px" }}>
-                Task Title *
+                {t.taskTitleLabel}
               </label>
               <input
                 type="text"
                 className="input-field"
-                placeholder="e.g., Complete Chapter 5 Summary"
+                placeholder={t.taskTitlePlaceholder}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
@@ -87,11 +91,11 @@ export default function NewTaskPage() {
 
             <div>
               <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "6px" }}>
-                Description
+                {t.descriptionLabel}
               </label>
               <textarea
                 className="input-field"
-                placeholder="Add more details about this task..."
+                placeholder={t.descriptionPlaceholder}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 style={{ minHeight: "120px" }}
@@ -101,7 +105,7 @@ export default function NewTaskPage() {
             <div className="grid-2">
               <div>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "6px" }}>
-                  Course / Subject *
+                  {t.courseLabel}
                 </label>
                 <select
                   className="input-field"
@@ -109,7 +113,7 @@ export default function NewTaskPage() {
                   onChange={(e) => setFormData({ ...formData, course: e.target.value })}
                   required
                 >
-                  <option value="">Select course...</option>
+                  <option value="">{t.coursePlaceholder}</option>
                   <option value="Computer Science">Computer Science</option>
                   <option value="Mathematics">Mathematics</option>
                   <option value="Psychology">Psychology</option>
@@ -122,7 +126,7 @@ export default function NewTaskPage() {
 
               <div>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "6px" }}>
-                  Deadline *
+                  {t.deadlineLabel}
                 </label>
                 <input
                   type="date"
@@ -136,7 +140,7 @@ export default function NewTaskPage() {
 
             <div>
               <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "6px" }}>
-                Priority Level
+                {t.priorityLabel}
               </label>
               <div style={{ display: "flex", gap: "10px" }}>
                 {(["low", "medium", "high"] as const).map((p) => (
@@ -170,7 +174,7 @@ export default function NewTaskPage() {
                         : "var(--text-secondary)",
                     }}
                   >
-                    {p.charAt(0).toUpperCase() + p.slice(1)}
+                    {t.priority[p]}
                   </button>
                 ))}
               </div>
@@ -178,12 +182,12 @@ export default function NewTaskPage() {
 
             <div>
               <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "6px" }}>
-                Tags (comma separated)
+                {t.tagsLabel}
               </label>
               <input
                 type="text"
                 className="input-field"
-                placeholder="e.g., homework, research, writing"
+                placeholder={t.tagsPlaceholder}
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
               />
@@ -193,14 +197,14 @@ export default function NewTaskPage() {
 
         <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
           <Link href="/tasks" className="btn-secondary">
-            Cancel
+            {t.cancel}
           </Link>
           <button type="submit" className="btn-primary">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Create Task
+            {t.createTask}
           </button>
         </div>
       </form>
