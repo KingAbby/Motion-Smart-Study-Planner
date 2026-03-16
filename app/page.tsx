@@ -2,6 +2,9 @@
 
 import StatsCard from "./components/StatsCard";
 import Link from "next/link";
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
+import { BulbOutlined } from "@ant-design/icons";
 
 const upcomingTasks = [
   {
@@ -39,19 +42,59 @@ const upcomingTasks = [
 ];
 
 const todaySchedule = [
-  { time: "08:00 - 09:30", subject: "Mathematics", type: "Lecture", color: "#6366f1" },
-  { time: "10:00 - 11:00", subject: "Psychology", type: "Study Session", color: "#8b5cf6" },
-  { time: "13:00 - 14:30", subject: "Computer Science", type: "Lab", color: "#3b82f6" },
-  { time: "15:00 - 16:00", subject: "Chemistry", type: "Review", color: "#10b981" },
+  {
+    time: "08:00 - 09:30",
+    subject: "Mathematics",
+    type: "Lecture",
+    color: "#6366f1",
+  },
+  {
+    time: "10:00 - 11:00",
+    subject: "Psychology",
+    type: "Study Session",
+    color: "#8b5cf6",
+  },
+  {
+    time: "13:00 - 14:30",
+    subject: "Computer Science",
+    type: "Lab",
+    color: "#3b82f6",
+  },
+  {
+    time: "15:00 - 16:00",
+    subject: "Chemistry",
+    type: "Review",
+    color: "#10b981",
+  },
 ];
 
-const priorityStyles: Record<string, { bg: string; color: string; label: string }> = {
-  high: { bg: "rgba(239, 68, 68, 0.15)", color: "#f87171", label: "High" },
-  medium: { bg: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", label: "Medium" },
-  low: { bg: "rgba(16, 185, 129, 0.15)", color: "#34d399", label: "Low" },
-};
-
 export default function Dashboard() {
+  const { language } = useLanguage();
+  const t = translations[language].dashboard;
+  const tTasks = translations[language].tasks;
+  const subtitleParts = t.welcomeSubtitle.split("{count}");
+  const dueCount = upcomingTasks.filter((task) => !task.done).length;
+  const priorityStyles: Record<
+    string,
+    { bg: string; color: string; label: string }
+  > = {
+    high: {
+      bg: "rgba(239, 68, 68, 0.15)",
+      color: "#f87171",
+      label: tTasks.priority.high,
+    },
+    medium: {
+      bg: "rgba(245, 158, 11, 0.15)",
+      color: "#fbbf24",
+      label: tTasks.priority.medium,
+    },
+    low: {
+      bg: "rgba(16, 185, 129, 0.15)",
+      color: "#34d399",
+      label: tTasks.priority.low,
+    },
+  };
+
   return (
     <div>
       {/* Welcome Banner */}
@@ -60,7 +103,8 @@ export default function Dashboard() {
         style={{
           padding: "32px",
           marginBottom: "28px",
-          background: "linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1))",
+          background:
+            "linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1))",
           position: "relative",
           overflow: "hidden",
         }}
@@ -72,32 +116,60 @@ export default function Dashboard() {
             right: "-20px",
             width: "180px",
             height: "180px",
-            background: "radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)",
             borderRadius: "50%",
           }}
         />
         <div style={{ position: "relative", zIndex: 1 }}>
-          <h1 style={{ fontSize: "28px", fontWeight: 700, marginBottom: "8px" }}>
-            Good Morning, Student! 👋
+          <h1
+            style={{ fontSize: "28px", fontWeight: 700, marginBottom: "8px" }}
+          >
+            {t.welcomeTitle}
           </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "15px", marginBottom: "20px" }}>
-            You have <strong style={{ color: "var(--text-accent)" }}>3 tasks</strong> due this week.
-            Stay focused and keep up the great work!
+          <p
+            style={{
+              color: "var(--text-secondary)",
+              fontSize: "15px",
+              marginBottom: "20px",
+            }}
+          >
+            {subtitleParts[0]}
+            <strong style={{ color: "var(--text-accent)" }}>{dueCount}</strong>
+            {subtitleParts[1] || ""}
           </p>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <Link href="/tasks" className="btn-primary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M9 11l3 3L22 4" />
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
               </svg>
-              View Tasks
+              {t.viewTasks}
             </Link>
             <Link href="/timer" className="btn-secondary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
-              Start Focus
+              {t.startFocus}
             </Link>
           </div>
         </div>
@@ -108,9 +180,19 @@ export default function Dashboard() {
         <div className="animate-fade-in stagger-1" style={{ opacity: 0 }}>
           <StatsCard
             icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+              </svg>
             }
-            label="Tasks Today"
+            label={t.statsTasksToday}
             value="5"
             trend="12%"
             trendUp={true}
@@ -120,9 +202,19 @@ export default function Dashboard() {
         <div className="animate-fade-in stagger-2" style={{ opacity: 0 }}>
           <StatsCard
             icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
             }
-            label="Study Hours"
+            label={t.statsStudyHours}
             value="6.5h"
             trend="8%"
             trendUp={true}
@@ -132,9 +224,18 @@ export default function Dashboard() {
         <div className="animate-fade-in stagger-3" style={{ opacity: 0 }}>
           <StatsCard
             icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
             }
-            label="Completed"
+            label={t.statsCompleted}
             value="12"
             trend="3%"
             trendUp={false}
@@ -144,9 +245,18 @@ export default function Dashboard() {
         <div className="animate-fade-in stagger-4" style={{ opacity: 0 }}>
           <StatsCard
             icon={
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
             }
-            label="Focus Sessions"
+            label={t.statsFocusSessions}
             value="8"
             trend="15%"
             trendUp={true}
@@ -158,7 +268,10 @@ export default function Dashboard() {
       {/* Main Grid */}
       <div className="grid-2" style={{ marginBottom: "28px" }}>
         {/* Upcoming Tasks */}
-        <div className="glass-card animate-fade-in stagger-5" style={{ padding: "24px", opacity: 0 }}>
+        <div
+          className="glass-card animate-fade-in stagger-5"
+          style={{ padding: "24px", opacity: 0 }}
+        >
           <div
             style={{
               display: "flex",
@@ -167,7 +280,9 @@ export default function Dashboard() {
               marginBottom: "20px",
             }}
           >
-            <h2 style={{ fontSize: "18px", fontWeight: 600 }}>Upcoming Tasks</h2>
+            <h2 style={{ fontSize: "18px", fontWeight: 600 }}>
+              {t.upcomingTasks}
+            </h2>
             <Link
               href="/tasks"
               style={{
@@ -177,10 +292,12 @@ export default function Dashboard() {
                 fontWeight: 500,
               }}
             >
-              View All →
+              {translations[language].common.viewAll}
             </Link>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+          >
             {upcomingTasks.map((task) => (
               <div
                 key={task.id}
@@ -199,7 +316,16 @@ export default function Dashboard() {
                   className={`custom-checkbox ${task.done ? "checked" : ""}`}
                 >
                   {task.done && (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   )}
@@ -209,7 +335,9 @@ export default function Dashboard() {
                     style={{
                       fontSize: "14px",
                       fontWeight: 500,
-                      color: task.done ? "var(--text-muted)" : "var(--text-primary)",
+                      color: task.done
+                        ? "var(--text-muted)"
+                        : "var(--text-primary)",
                       textDecoration: task.done ? "line-through" : "none",
                       marginBottom: "4px",
                       overflow: "hidden",
@@ -251,7 +379,10 @@ export default function Dashboard() {
         </div>
 
         {/* Today&apos;s Schedule */}
-        <div className="glass-card animate-fade-in stagger-6" style={{ padding: "24px", opacity: 0 }}>
+        <div
+          className="glass-card animate-fade-in stagger-6"
+          style={{ padding: "24px", opacity: 0 }}
+        >
           <div
             style={{
               display: "flex",
@@ -260,7 +391,9 @@ export default function Dashboard() {
               marginBottom: "20px",
             }}
           >
-            <h2 style={{ fontSize: "18px", fontWeight: 600 }}>Today&apos;s Schedule</h2>
+            <h2 style={{ fontSize: "18px", fontWeight: 600 }}>
+              {t.todaysSchedule}
+            </h2>
             <Link
               href="/schedule"
               style={{
@@ -270,10 +403,12 @@ export default function Dashboard() {
                 fontWeight: 500,
               }}
             >
-              Full Calendar →
+              {t.fullCalendar}
             </Link>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+          >
             {todaySchedule.map((item, i) => (
               <div
                 key={i}
@@ -335,9 +470,16 @@ export default function Dashboard() {
         style={{ padding: "24px", marginBottom: "28px" }}
       >
         <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "20px" }}>
-          Daily Productivity Score
+          {t.dailyProductivity}
         </h2>
-        <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "24px",
+            flexWrap: "wrap",
+          }}
+        >
           <div
             style={{
               width: "120px",
@@ -363,17 +505,33 @@ export default function Dashboard() {
                 flexDirection: "column",
               }}
             >
-              <span style={{ fontSize: "28px", fontWeight: 700, color: "var(--text-accent)" }}>78</span>
-              <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>out of 100</span>
+              <span
+                style={{
+                  fontSize: "28px",
+                  fontWeight: 700,
+                  color: "var(--text-accent)",
+                }}
+              >
+                78
+              </span>
+              <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                {t.outOf100}
+              </span>
             </div>
           </div>
 
           <div style={{ flex: 1, minWidth: "200px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "14px" }}
+            >
               {[
-                { label: "Tasks Completed", value: 80, color: "#6366f1" },
-                { label: "Focus Time", value: 65, color: "#8b5cf6" },
-                { label: "Study Goals", value: 90, color: "#10b981" },
+                {
+                  label: t.progressTasksCompleted,
+                  value: 80,
+                  color: "#6366f1",
+                },
+                { label: t.progressFocusTime, value: 65, color: "#8b5cf6" },
+                { label: t.progressStudyGoals, value: 90, color: "#10b981" },
               ].map((item) => (
                 <div key={item.label}>
                   <div
@@ -384,7 +542,9 @@ export default function Dashboard() {
                       fontSize: "13px",
                     }}
                   >
-                    <span style={{ color: "var(--text-secondary)" }}>{item.label}</span>
+                    <span style={{ color: "var(--text-secondary)" }}>
+                      {item.label}
+                    </span>
                     <span style={{ fontWeight: 600 }}>{item.value}%</span>
                   </div>
                   <div className="progress-bar">
@@ -416,11 +576,14 @@ export default function Dashboard() {
             fontSize: "13px",
           }}
         >
-          <span style={{ fontSize: "18px" }}>💡</span>
+          <span style={{ fontSize: "18px", display: "inline-flex" }}>
+            <BulbOutlined />
+          </span>
           <div>
             <strong style={{ color: "#34d399" }}>Study Recommendation:</strong>{" "}
             <span style={{ color: "var(--text-secondary)" }}>
-              Based on your patterns, your peak focus hours are between 9:00 AM - 12:00 PM. Try scheduling your hardest tasks during this window.
+              Based on your patterns, your peak focus hours are between 9:00 AM
+              - 12:00 PM. Try scheduling your hardest tasks during this window.
             </span>
           </div>
         </div>

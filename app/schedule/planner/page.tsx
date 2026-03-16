@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
 
 const deadlines = [
   { id: 1, title: "Essay: Impact of AI on Education", course: "Computer Science", deadline: "2026-03-17", hoursNeeded: 4, priority: "high" },
@@ -40,6 +42,8 @@ const priorityColors: Record<string, string> = {
 };
 
 export default function PlannerPage() {
+  const { language } = useLanguage();
+  const t = translations[language].planner;
   const [isGenerated, setIsGenerated] = useState(false);
   const [studyHoursPerDay, setStudyHoursPerDay] = useState("4");
 
@@ -52,9 +56,9 @@ export default function PlannerPage() {
               <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
             </svg>
           </Link>
-          <h1>Smart Study Planner</h1>
+          <h1>{t.title}</h1>
         </div>
-        <p>Auto-generate an optimized study schedule based on your deadlines</p>
+        <p>{t.subtitle}</p>
       </div>
 
       {!isGenerated ? (
@@ -62,12 +66,12 @@ export default function PlannerPage() {
           {/* Configuration */}
           <div className="glass-card-static animate-fade-in" style={{ padding: "28px", marginBottom: "24px" }}>
             <h2 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "20px", color: "var(--text-accent)" }}>
-              ⚡ Schedule Configuration
+              {t.configTitle}
             </h2>
             <div className="grid-2" style={{ marginBottom: "20px" }}>
               <div>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "6px" }}>
-                  Max study hours per day
+                  {t.maxHoursPerDay}
                 </label>
                 <select
                   className="input-field"
@@ -83,13 +87,13 @@ export default function PlannerPage() {
               </div>
               <div>
                 <label style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "6px" }}>
-                  Preferred study time
+                  {t.preferredStudyTime}
                 </label>
                 <select className="input-field">
-                  <option>Morning (8:00 - 12:00)</option>
-                  <option>Afternoon (13:00 - 17:00)</option>
-                  <option>Evening (18:00 - 22:00)</option>
-                  <option>Flexible</option>
+                  <option>{t.morning}</option>
+                  <option>{t.afternoon}</option>
+                  <option>{t.evening}</option>
+                  <option>{t.flexible}</option>
                 </select>
               </div>
             </div>
@@ -98,7 +102,7 @@ export default function PlannerPage() {
           {/* Deadlines */}
           <div className="glass-card-static animate-fade-in" style={{ padding: "28px", marginBottom: "24px" }}>
             <h2 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "20px" }}>
-              📋 Tasks to Schedule
+              {t.tasksToSchedule}
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {deadlines.map((d) => (
@@ -122,7 +126,7 @@ export default function PlannerPage() {
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>{d.title}</div>
                     <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-                      {d.course} • Due: {d.deadline} • ~{d.hoursNeeded}h needed
+                      {d.course} • {t.dueLabel}: {d.deadline} • ~{d.hoursNeeded}{t.hoursNeededSuffix}
                     </div>
                   </div>
                   <div
@@ -141,7 +145,7 @@ export default function PlannerPage() {
           <div style={{ display: "flex", justifyContent: "center" }}>
             <button className="btn-primary" style={{ fontSize: "15px", padding: "14px 32px" }} onClick={() => setIsGenerated(true)}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
-              Generate Optimized Schedule
+              {t.generateSchedule}
             </button>
           </div>
         </>
@@ -164,7 +168,7 @@ export default function PlannerPage() {
             }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-            Schedule generated! 17 hours of study distributed across 5 days.
+            {t.scheduleGenerated}
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -194,7 +198,7 @@ export default function PlannerPage() {
                   }}>
                     {day.day}
                   </span>
-                  {day.sessions.length} session{day.sessions.length > 1 ? "s" : ""}
+                  {day.sessions.length} {day.sessions.length === 1 ? t.session : t.sessions}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {day.sessions.map((session, si) => (
@@ -223,10 +227,10 @@ export default function PlannerPage() {
 
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "28px" }}>
             <button className="btn-secondary" onClick={() => setIsGenerated(false)}>
-              Regenerate
+              {t.regenerate}
             </button>
             <Link href="/schedule" className="btn-primary">
-              Apply to Calendar
+              {t.applyToCalendar}
             </Link>
           </div>
         </>

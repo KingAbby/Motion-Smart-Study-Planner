@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
 
 interface Task {
   id: number;
@@ -97,17 +99,23 @@ const initialTasks: Task[] = [
   },
 ];
 
-const priorityConfig = {
-  high: { bg: "rgba(239, 68, 68, 0.15)", color: "#f87171", label: "High" },
-  medium: { bg: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", label: "Medium" },
-  low: { bg: "rgba(16, 185, 129, 0.15)", color: "#34d399", label: "Low" },
-};
-
-const filters = ["All", "Today", "This Week", "High Priority", "Completed"];
-
 export default function TasksPage() {
+  const { language } = useLanguage();
+  const t = translations[language].tasks;
+  const priorityConfig = {
+    high: { bg: "rgba(239, 68, 68, 0.15)", color: "#f87171", label: t.priority.high },
+    medium: { bg: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", label: t.priority.medium },
+    low: { bg: "rgba(16, 185, 129, 0.15)", color: "#34d399", label: t.priority.low },
+  };
+  const filters = [
+    { value: "all", label: t.filters.all },
+    { value: "today", label: t.filters.today },
+    { value: "thisWeek", label: t.filters.thisWeek },
+    { value: "highPriority", label: t.filters.highPriority },
+    { value: "completed", label: t.filters.completed },
+  ];
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const toggleTask = (id: number) => {
@@ -124,13 +132,13 @@ export default function TasksPage() {
     if (!matchesSearch) return false;
 
     switch (activeFilter) {
-      case "Today":
+      case "today":
         return task.deadline === "2026-03-17";
-      case "This Week":
+      case "thisWeek":
         return true;
-      case "High Priority":
+      case "highPriority":
         return task.priority === "high";
-      case "Completed":
+      case "completed":
         return task.done;
       default:
         return true;
@@ -143,8 +151,8 @@ export default function TasksPage() {
   return (
     <div>
       <div className="page-header animate-fade-in">
-        <h1>Task Manager</h1>
-        <p>Organize your assignments, track deadlines, and stay on top of your coursework</p>
+        <h1>{t.title}</h1>
+        <p>{t.subtitle}</p>
       </div>
 
       {/* Progress Summary */}
@@ -162,7 +170,7 @@ export default function TasksPage() {
         <div style={{ flex: 1, minWidth: "200px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
             <span style={{ fontSize: "14px", color: "var(--text-secondary)" }}>
-              Overall Progress
+              {t.overallProgress}
             </span>
             <span style={{ fontSize: "14px", fontWeight: 600 }}>
               {completedCount}/{tasks.length} tasks
@@ -177,21 +185,21 @@ export default function TasksPage() {
             <div style={{ fontSize: "22px", fontWeight: 700, color: "var(--accent-primary)" }}>
               {tasks.filter((t) => !t.done).length}
             </div>
-            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Pending</div>
+            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{t.pending}</div>
           </div>
           <div style={{ width: "1px", background: "var(--border-color)" }} />
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: "22px", fontWeight: 700, color: "var(--success)" }}>
               {completedCount}
             </div>
-            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Done</div>
+            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{t.done}</div>
           </div>
           <div style={{ width: "1px", background: "var(--border-color)" }} />
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: "22px", fontWeight: 700, color: "var(--danger)" }}>
               {tasks.filter((t) => t.priority === "high" && !t.done).length}
             </div>
-            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Urgent</div>
+            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{t.urgent}</div>
           </div>
         </div>
       </div>
@@ -225,7 +233,7 @@ export default function TasksPage() {
           <input
             type="text"
             className="input-field"
-            placeholder="Search tasks or courses..."
+            placeholder={t.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ paddingLeft: "42px" }}
@@ -237,11 +245,11 @@ export default function TasksPage() {
       <div className="tabs animate-fade-in">
         {filters.map((f) => (
           <button
-            key={f}
-            className={`tab ${activeFilter === f ? "active" : ""}`}
-            onClick={() => setActiveFilter(f)}
+            key={f.value}
+            className={`tab ${activeFilter === f.value ? "active" : ""}`}
+            onClick={() => setActiveFilter(f.value)}
           >
-            {f}
+            {f.label}
           </button>
         ))}
       </div>
@@ -254,8 +262,8 @@ export default function TasksPage() {
               <path d="M9 11l3 3L22 4" />
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
             </svg>
-            <h3>No tasks found</h3>
-            <p>Try adjusting your filter or add a new task</p>
+            <h3>{t.emptyTitle}</h3>
+            <p>{t.emptyDesc}</p>
           </div>
         ) : (
           filteredTasks.map((task, index) => (
@@ -380,7 +388,7 @@ export default function TasksPage() {
       </div>
 
       {/* FAB */}
-      <Link href="/tasks/new" className="fab" title="Add New Task">
+      <Link href="/tasks/new" className="fab" title={t.addTaskFab}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />

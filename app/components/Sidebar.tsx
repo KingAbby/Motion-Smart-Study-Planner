@@ -3,6 +3,8 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { useLanguage } from "@/lib/LanguageContext";
+import { translations } from "@/lib/translations";
 import {
   AppstoreOutlined,
   CheckSquareOutlined,
@@ -29,31 +31,6 @@ interface NavSection {
   items: NavItem[];
 }
 
-const navSections: NavSection[] = [
-  {
-    section: "Overview",
-    items: [
-      { name: "Dashboard", href: "/", icon: <AppstoreOutlined /> },
-    ],
-  },
-  {
-    section: "Features",
-    items: [
-      { name: "Tasks", href: "/tasks", icon: <CheckSquareOutlined /> },
-      { name: "Schedule", href: "/schedule", icon: <CalendarOutlined /> },
-      { name: "Notes", href: "/notes", icon: <FileTextOutlined /> },
-      { name: "Progress", href: "/progress", icon: <BarChartOutlined /> },
-      { name: "Focus Timer", href: "/timer", icon: <ClockCircleOutlined /> },
-    ],
-  },
-  {
-    section: "Account",
-    items: [
-      { name: "Profile", href: "/profile", icon: <UserOutlined /> },
-      { name: "Settings", href: "/settings", icon: <SettingOutlined /> },
-    ],
-  },
-];
 
 const sidebarStyles = {
   logo: {
@@ -140,7 +117,34 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
+  const { language } = useLanguage();
+  const t = translations[language].sidebar;
   const pathname = usePathname();
+  const navSections: NavSection[] = [
+    {
+      section: t.overview,
+      items: [
+        { name: t.dashboard, href: "/", icon: <AppstoreOutlined /> },
+      ],
+    },
+    {
+      section: t.features,
+      items: [
+        { name: t.tasks, href: "/tasks", icon: <CheckSquareOutlined /> },
+        { name: t.schedule, href: "/schedule", icon: <CalendarOutlined /> },
+        { name: t.notes, href: "/notes", icon: <FileTextOutlined /> },
+        { name: t.progress, href: "/progress", icon: <BarChartOutlined /> },
+        { name: t.focusTimer, href: "/timer", icon: <ClockCircleOutlined /> },
+      ],
+    },
+    {
+      section: t.account,
+      items: [
+        { name: t.profile, href: "/profile", icon: <UserOutlined /> },
+        { name: t.settings, href: "/settings", icon: <SettingOutlined /> },
+      ],
+    },
+  ];
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -189,11 +193,10 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <div className="glass-card-static" style={sidebarStyles.studyTip}>
           <div style={sidebarStyles.studyTipTitle}>
             <BulbOutlined />
-            Study Tip
+            {t.studyTipTitle}
           </div>
           <div style={sidebarStyles.studyTipText}>
-            Break your study into 25-min focus sessions with 5-min breaks for
-            maximum retention.
+            {t.studyTipText}
           </div>
         </div>
       </aside>
