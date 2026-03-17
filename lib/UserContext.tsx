@@ -2,15 +2,11 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
-
-const STORAGE_USER_KEY = "appUserAccount";
-const STORAGE_AUTH_KEY = "appIsAuthenticated";
 
 export interface UserProfile {
   firstName: string;
@@ -51,112 +47,96 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
-function readStoredAccount(): StoredUserAccount | null {
-  if (typeof window === "undefined") return null;
-  const storedUser = localStorage.getItem(STORAGE_USER_KEY);
-  if (!storedUser) return null;
-
-  try {
-    return JSON.parse(storedUser) as StoredUserAccount;
-  } catch {
-    localStorage.removeItem(STORAGE_USER_KEY);
-    return null;
-  }
+function toTitleCase(value: string) {
+  return value
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
 }
 
-function readStoredAuth(): boolean {
-  if (typeof window === "undefined") return false;
-  return localStorage.getItem(STORAGE_AUTH_KEY) === "true";
+function fallbackFromEmail(email: string) {
+  const localPart = normalizeEmail(email).split("@")[0] || "student";
+  const clean = localPart.replace(/[^a-zA-Z]/g, " ").trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  const first = toTitleCase(parts[0] || "Student");
+  const last = toTitleCase(parts.slice(1).join(" ") || "User");
+
+  return { firstName: first, lastName: last };
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [account, setAccount] = useState<StoredUserAccount | null>(() =>
-    readStoredAccount(),
-  );
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() =>
-    readStoredAuth(),
-  );
+  const [account, setAccount] = useState<StoredUserAccount | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const persist = useCallback((nextAccount: StoredUserAccount | null, auth: boolean) => {
-    if (typeof window === "undefined") return;
+  const signUp = (payload: SignUpPayload) => {
+    const next: StoredUserAccount = {
+      firstName: payload.firstName.trim(),
+      lastName: payload.lastName.trim(),
+      email: normalizeEmail(payload.email),
+      password: payload.password,
+      university: payload.university.trim(),
+      major: payload.major.trim(),
+      semester: payload.semester.trim(),
+      joinedAt: new Date().toISOString().slice(0, 10),
+    };
 
-    if (nextAccount) {
-      localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(nextAccount));
+    setAccount(next);
+    setIsAuthenticated(true);
+    return { ok: true };
+  };
+
+  const signIn = (email: string, password: string) => {
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!account) {
+      const fallbackIdentity = fallbackFromEmail(normalizedEmail);
+      setAccount({
+        firstName: fallbackIdentity.firstName,
+        lastName: fallbackIdentity.lastName,
+        email: normalizedEmail,
+        password,
+        university: "-",
+        major: "-",
+        semester: "-",
+        joinedAt: new Date().toISOString().slice(0, 10),
+      });
     } else {
-      localStorage.removeItem(STORAGE_USER_KEY);
+      setAccount((prev) =>
+        prev
+          ? {
+              ...prev,
+              email: normalizedEmail,
+              password,
+            }
+          : prev,
+      );
     }
 
-    localStorage.setItem(STORAGE_AUTH_KEY, String(auth));
-  }, []);
+    setIsAuthenticated(true);
+    return { ok: true };
+  };
 
-  const signUp = useCallback(
-    (payload: SignUpPayload) => {
-      if (account && normalizeEmail(account.email) === normalizeEmail(payload.email)) {
-        return { ok: false, error: "email_exists" };
-      }
-
-      const next: StoredUserAccount = {
-        firstName: payload.firstName.trim(),
-        lastName: payload.lastName.trim(),
-        email: normalizeEmail(payload.email),
-        password: payload.password,
-        university: payload.university.trim(),
-        major: payload.major.trim(),
-        semester: payload.semester.trim(),
-        joinedAt: new Date().toISOString().slice(0, 10),
-      };
-
-      setAccount(next);
-      setIsAuthenticated(true);
-      persist(next, true);
-      return { ok: true };
-    },
-    [account, persist],
-  );
-
-  const signIn = useCallback(
-    (email: string, password: string) => {
-      if (!account) {
-        return { ok: false, error: "invalid_credentials" };
-      }
-
-      const validEmail = normalizeEmail(account.email) === normalizeEmail(email);
-      const validPassword = account.password === password;
-
-      if (!validEmail || !validPassword) {
-        return { ok: false, error: "invalid_credentials" };
-      }
-
-      setIsAuthenticated(true);
-      persist(account, true);
-      return { ok: true };
-    },
-    [account, persist],
-  );
-
-  const signOut = useCallback(() => {
+  const signOut = () => {
     setIsAuthenticated(false);
-    persist(account, false);
-  }, [account, persist]);
+    setAccount(null);
+  };
 
-  const updateProfile = useCallback(
-    (payload: Omit<SignUpPayload, "email" | "password">) => {
-      if (!account) return;
+  const updateProfile = (payload: Omit<SignUpPayload, "email" | "password">) => {
+    if (!account) return;
 
-      const next: StoredUserAccount = {
-        ...account,
-        firstName: payload.firstName.trim(),
-        lastName: payload.lastName.trim(),
-        university: payload.university.trim(),
-        major: payload.major.trim(),
-        semester: payload.semester.trim(),
-      };
+    const next: StoredUserAccount = {
+      ...account,
+      firstName: payload.firstName.trim(),
+      lastName: payload.lastName.trim(),
+      university: payload.university.trim(),
+      major: payload.major.trim(),
+      semester: payload.semester.trim(),
+    };
 
-      setAccount(next);
-      persist(next, isAuthenticated);
-    },
-    [account, isAuthenticated, persist],
-  );
+    setAccount(next);
+  };
 
   const userProfile = useMemo<UserProfile | null>(() => {
     if (!account) return null;
