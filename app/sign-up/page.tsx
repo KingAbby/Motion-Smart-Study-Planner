@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useUser } from "@/lib/UserContext";
 import { translations } from "@/lib/translations";
@@ -17,6 +18,7 @@ export default function SignUpPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [university, setUniversity] = useState("");
   const [major, setMajor] = useState("");
   const [semester, setSemester] = useState("");
@@ -96,7 +98,36 @@ export default function SignUpPage() {
               <label style={{ display: "block", marginBottom: "6px", fontSize: "13px", color: "var(--text-secondary)" }}>
                 {t.password}
               </label>
-              <input className="input-field" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+              <div style={{ position: "relative" }}>
+                <input
+                  className="input-field"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{ paddingRight: "42px" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    border: "none",
+                    background: "transparent",
+                    color: "var(--text-secondary)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: 0,
+                  }}
+                >
+                  {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                </button>
+              </div>
             </div>
           </div>
 
