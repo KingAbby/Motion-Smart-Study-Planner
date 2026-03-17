@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import StatsCard from "./components/StatsCard";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useUser } from "@/lib/UserContext";
 import { translations } from "@/lib/translations";
 import { BulbOutlined } from "@ant-design/icons";
 
@@ -69,9 +72,17 @@ const todaySchedule = [
 ];
 
 export default function Dashboard() {
+  const router = useRouter();
   const { language } = useLanguage();
+  const { isAuthenticated, userProfile } = useUser();
   const t = translations[language].dashboard;
   const tTasks = translations[language].tasks;
+  const displayName = userProfile
+    ? `${userProfile.firstName} ${userProfile.lastName}`
+    : language === "id"
+      ? "Pelajar"
+      : "Student";
+  const welcomeTitle = t.welcomeTitle.replace("{name}", displayName);
   const subtitleParts = t.welcomeSubtitle.split("{count}");
   const dueCount = upcomingTasks.filter((task) => !task.done).length;
   const priorityStyles: Record<
@@ -94,6 +105,12 @@ export default function Dashboard() {
       label: tTasks.priority.low,
     },
   };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/landing");
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <div>
@@ -125,7 +142,7 @@ export default function Dashboard() {
           <h1
             style={{ fontSize: "28px", fontWeight: 700, marginBottom: "8px" }}
           >
-            {t.welcomeTitle}
+            {welcomeTitle}
           </h1>
           <p
             style={{
