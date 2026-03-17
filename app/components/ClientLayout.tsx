@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { MenuOutlined, CloseOutlined } from "@ant-design/icons";
 import Sidebar from "./Sidebar";
 
@@ -10,6 +11,9 @@ interface ClientLayoutProps {
 
 export default function ClientLayout({ children }: ClientLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const authRoutes = ["/landing", "/sign-in", "/sign-up"];
+  const isAuthRoute = authRoutes.includes(pathname);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -54,6 +58,10 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const closeSidebar = () => setSidebarOpen(false);
+
+  if (isAuthRoute) {
+    return <main className="main-content auth-main">{children}</main>;
+  }
 
   return (
     <>
